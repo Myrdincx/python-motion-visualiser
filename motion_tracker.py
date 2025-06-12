@@ -28,16 +28,16 @@ def main():
     max_total_lines = get_int_input("Max total connection lines per frame (0 to disable lines)", 5)
     max_jump_distance = get_float_input("Max pixel jump distance for tracking lines", 20)
 
-    # Drawing parameters
+    # Drawing settings (user can customize)
+    BOX_THICKNESS = get_int_input("Box thickness", 1)
+    LINE_THICKNESS = get_int_input("Line thickness", 1)
+    FONT_SCALE = get_float_input("Font scale", 0.5)
+    FONT_THICKNESS = get_int_input("Font thickness", 1)
+
     COLOR = (255, 255, 255)
-    BOX_THICKNESS = 1
-    LINE_THICKNESS = 1
-    FONT_SCALE = 0.5
-    FONT_THICKNESS = 1
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     MIN_TRACK_LINE_LENGTH = 10
     MIN_WEB_LINE_LENGTH = 20
-
     temp_video = "temp_video_no_audio.mp4"
 
     cap = cv2.VideoCapture(input_video)
@@ -78,7 +78,7 @@ def main():
                 # Draw rectangle
                 cv2.rectangle(frame, (x, y), (x + w, y + h), COLOR, BOX_THICKNESS)
 
-                # Display coordinates above the box
+                # Draw coordinates above box
                 label = f"({cx}, {cy})"
                 text_size, _ = cv2.getTextSize(label, FONT, FONT_SCALE, FONT_THICKNESS)
                 text_x = x
