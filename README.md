@@ -7,14 +7,19 @@ It detects moving objects as blobs, draws bounding boxes around them, and connec
 
 ## Features
 - Tracks moving objects using background subtraction
-- Draws bounding boxes for the most prominent moving objects
-- Optionally draws lines between detected objects to illustrate motion or relationships:
-  - Web-like random lines (between objects in the same frame)
-- Merges original audio back into the processed video using FFmpeg.
+- Draws bounding boxes around detected blobs
+- Optional pixelation effect inside each bounding box
+- Displays coordinates for tracked objects
+- Connects objects with:
+  - Motion tracking lines between frames
+  - Web-style connection lines within the same frame
+- Adjustable sensitivity levels: low, medium, high
+- Merges the original audio back into the processed video using FFmpeg
 
 ## Requirements
 - Python 3
 - OpenCV
+- NumPy
 - FFmpeg (must be installed and available in your system’s PATH)
 
 Install Python dependencies with:
@@ -35,24 +40,23 @@ python3 motion_tracker.py
 ```
 
 You'll be prompted for the following (with defaults):
-| Parameter                                  | Default      | Description                                                                            |
-| ------------------------------------------ | ------------ | -------------------------------------------------------------------------------------- |
-| Input video filename                       | `input.mp4`  | Video file to process                                                                  |
-| Output video filename                      | `output.mp4` | Output video file name                                                                 |
-| Max boxes per frame                        | 20           | Maximum number of detected boxes per frame                                             |
-| Max trace length (frames to track)         | 30           | How many frames to keep trace history                                                  |
-| Max total connection lines per frame       | 5            | Number of lines to draw connecting detected boxes (0 disables lines)                   |
-| Max pixel jump distance for tracking lines | 20           | Maximum pixel distance for connecting tracked objects                                  |
-| Box thickness                              | 1            | Thickness of bounding box lines                                                        |
-| Line thickness                             | 1            | Thickness of tracking and web connection lines                                         |
-| Font scale                                 | 0.5          | Scale of coordinate text                                                               |
-| Font thickness                             | 1            | Thickness of coordinate text                                                           |
-| Show coordinates on boxes?                 | Yes          | Whether to display coordinates above bounding boxes                                    |
-| Enable pixelation effect inside boxes?     | Yes          | Pixelation is disabled by default                                                      |
-| Pixelation block size                      | 10           | Size of pixel blocks when pixelation is enabled                                        |
-| Max box width/height for pixelation        | 100          | Pixelation applies only to boxes smaller or equal to this size (0 disables size limit) |
-
-
+| Parameter                                  | Default      | Description                                                         |
+| ------------------------------------------ | ------------ | ------------------------------------------------------------------- |
+| Input video filename                       | `input.mp4`  | Path to input video                                                 |
+| Output video filename                      | `output.mp4` | Output video path                                                   |
+| Max boxes per frame                        | 20           | Max detected blobs per frame                                        |
+| Max trace length (frames to track)         | 30           | History length for drawing motion lines                             |
+| Max total connection lines per frame       | 5            | Number of connection lines to draw (0 = disable)                    |
+| Max pixel jump distance for tracking lines | 20           | Max distance for linking blobs across frames                        |
+| Box thickness                              | 1            | Thickness of bounding boxes                                         |
+| Line thickness                             | 1            | Thickness of lines between blobs                                    |
+| Font scale                                 | 0.5          | Size of text showing coordinates                                    |
+| Font thickness                             | 1            | Thickness of coordinate text                                        |
+| Show coordinates on boxes?                 | Yes          | Display (x, y) coordinates above each blob                          |
+| Enable pixelation effect inside boxes?     | Yes          | Replace region inside boxes with pixelated version                  |
+| Pixelation block size                      | 10           | Size of each pixel block in pixelation                              |
+| Max box width/height for pixelation        | 100          | Only pixelate boxes smaller than this (0 = no size limit)           |
+| Detection sensitivity                      | Medium       | Affects how aggressively the background subtractor detects movement |
 
 ### Files
 - `motion_tracker.py`: Main script
@@ -61,9 +65,7 @@ You'll be prompted for the following (with defaults):
 
 ### Tips
 
-- To completely disable drawing lines, just set:
-```lua
-Max total connection lines per frame: 0
-```
-- For faster rendering, reduce `Max boxes per frame`.
-- Works best with high-contrast, stable background videos.
+- Set `Max total connection lines per frame` to `0` to disable lines entirely.
+- Reduce `Max boxes per frame` to improve performance.
+- High-contrast, low-motion background videos yield better results.
+- "High" sensitivity works well for detecting subtle or fast motion, while "Low" helps reduce noise in stable scenes.
