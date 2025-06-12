@@ -36,7 +36,7 @@ def main():
     max_trace_length = get_int_input("Max trace length (number of frames to track)", 30)
     max_total_lines = get_int_input("Max total connection lines per frame (0 to disable lines)", 5)
     max_jump_distance = get_float_input("Max pixel jump distance for tracking lines", 20)
-    max_box_size = get_int_input("Max box width/height to display (0 to disable limit)", 200)
+    max_box_size = get_int_input("Max bounding box width/height (0 to disable filtering)", 300)
 
     # Drawing settings (user can customize)
     BOX_THICKNESS = get_int_input("Box thickness", 1)
@@ -116,10 +116,9 @@ def main():
                 break
             if cv2.contourArea(cnt) > contour_area_threshold:
                 x, y, w, h = cv2.boundingRect(cnt)
-
+                # Filter out too big boxes if max_box_size enabled
                 if max_box_size > 0 and (w > max_box_size or h > max_box_size):
-                    continue  # skip big boxes
-
+                    continue
                 cx, cy = x + w // 2, y + h // 2
                 centers.append((cx, cy))
 
@@ -197,10 +196,14 @@ def main():
         'ffmpeg', '-y',
         '-i', temp_video,
         '-i', input_video,
-        '-c:v', 'copy',
+        '-c:v', 'libx264',
+        '-preset', 'medium',
+        '-crf', '23',
         '-c:a', 'aac',
+        '-b:a', '128k',
         '-map', '0:v:0',
         '-map', '1:a:0',
+        '-movflags', '+faststart',
         output_video
     ]
 
@@ -217,4 +220,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
