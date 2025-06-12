@@ -18,8 +18,8 @@ It detects moving objects as blobs, draws bounding boxes around them, and connec
 
 ## Requirements
 - Python 3
-- OpenCV
-- NumPy
+- OpenCV (see below)
+- NumPy (see below)
 - FFmpeg (must be installed and available in your system’s PATH)
 
 Install Python dependencies with:
