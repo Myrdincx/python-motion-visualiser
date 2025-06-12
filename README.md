@@ -1,6 +1,9 @@
 # Blob Tracking with Python
 This Python script analyzes motion in a video, draws bounding boxes around moving objects, optionally connects them with lines, and exports a new video with the original audio.
 
+> [!WARNING]  
+> This script is far from perfect, results may vary. Feel free to contribute in order to make it better!
+
 ## Features
 - Tracks moving objects using background subtraction
 - Draws bounding boxes for the most prominent moving objects
