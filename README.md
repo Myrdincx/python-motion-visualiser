@@ -48,7 +48,7 @@ You'll be prompted for the following (with defaults):
 | Font scale                                 | 0.5          | Scale of coordinate text                                                               |
 | Font thickness                             | 1            | Thickness of coordinate text                                                           |
 | Show coordinates on boxes?                 | Yes          | Whether to display coordinates above bounding boxes                                    |
-| Enable pixelation effect inside boxes?     | No           | Pixelation is disabled by default                                                      |
+| Enable pixelation effect inside boxes?     | Yes          | Pixelation is disabled by default                                                      |
 | Pixelation block size                      | 10           | Size of pixel blocks when pixelation is enabled                                        |
 | Max box width/height for pixelation        | 100          | Pixelation applies only to boxes smaller or equal to this size (0 disables size limit) |
 
