@@ -35,19 +35,23 @@ python3 motion_tracker.py
 ```
 
 You'll be prompted for the following (with defaults):
-| Parameter                                 | Default      | Description                                     |
-| ----------------------------------------- | ------------ | ----------------------------------------------- |
-| Input video filename                      | `input.mp4`  | Video to process                                |
-| Output video filename                     | `output.mp4` | Result video filename                           |
-| Max boxes per frame                       | `20`         | Maximum detected blobs shown per frame          |
-| Max trace length (frames to track motion) | `30`         | Number of frames to remember for tracking lines |
-| Max total connection lines per frame      | `5`          | Set to `0` to disable lines                     |
-| Max jump distance (pixels)                | `20`         | Maximum distance to link blobs between frames   |
-| Box thickness                             | `1`          | Thickness of bounding boxes                     |
-| Line thickness                            | `1`          | Thickness of connecting lines                   |
-| Font scale                                | `0.5`        | Scale of coordinate text                        |
-| Font thickness                            | `1`          | Thickness of coordinate text                    |
-| Show coordinates on boxes?                | `Yes`        | Toggle coordinate display above bounding boxes  |
+| Parameter                                  | Default      | Description                                                                            |
+| ------------------------------------------ | ------------ | -------------------------------------------------------------------------------------- |
+| Input video filename                       | `input.mp4`  | Video file to process                                                                  |
+| Output video filename                      | `output.mp4` | Output video file name                                                                 |
+| Max boxes per frame                        | 20           | Maximum number of detected boxes per frame                                             |
+| Max trace length (frames to track)         | 30           | How many frames to keep trace history                                                  |
+| Max total connection lines per frame       | 5            | Number of lines to draw connecting detected boxes (0 disables lines)                   |
+| Max pixel jump distance for tracking lines | 20           | Maximum pixel distance for connecting tracked objects                                  |
+| Box thickness                              | 1            | Thickness of bounding box lines                                                        |
+| Line thickness                             | 1            | Thickness of tracking and web connection lines                                         |
+| Font scale                                 | 0.5          | Scale of coordinate text                                                               |
+| Font thickness                             | 1            | Thickness of coordinate text                                                           |
+| Show coordinates on boxes?                 | Yes          | Whether to display coordinates above bounding boxes                                    |
+| Enable pixelation effect inside boxes?     | No           | Pixelation is disabled by default                                                      |
+| Pixelation block size                      | 10           | Size of pixel blocks when pixelation is enabled                                        |
+| Max box width/height for pixelation        | 100          | Pixelation applies only to boxes smaller or equal to this size (0 disables size limit) |
+
 
 
 ### Files
