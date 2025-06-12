@@ -35,7 +35,7 @@ def main():
     max_boxes = get_int_input("Max boxes per frame", 20)
     max_trace_length = get_int_input("Max trace length (number of frames to track)", 30)
     max_total_lines = get_int_input("Max total connection lines per frame (0 to disable lines)", 5)
-    max_jump_distance = get_float_input("Max pixel jump distance for tracking lines", 20)
+    max_jump_distance = get_float_input("Max pixel jump distance for tracking lines", 30)  # Increased from 20 to 30
 
     # Drawing settings (user can customize)
     BOX_THICKNESS = get_int_input("Box thickness", 1)
@@ -56,7 +56,7 @@ def main():
         pixel_size = None
         max_pixelate_box_size = 0
 
-    # Sensitivity setting
+    # Sensitivity setting (overridden with new defaults for smoother detection)
     sensitivity_choice = input("Detection sensitivity? [low/medium/high, default: medium]: ").strip().lower() or "medium"
     if sensitivity_choice == "high":
         contour_area_threshold = 30
@@ -65,8 +65,8 @@ def main():
         contour_area_threshold = 200
         var_threshold = 25
     else:  # medium
-        contour_area_threshold = 80
-        var_threshold = 10
+        contour_area_threshold = 100  # raised from 80 to 100 for less noise
+        var_threshold = 7  # lowered from 10 to 7 for better detection sensitivity
 
     COLOR = (255, 255, 255)
     FONT = cv2.FONT_HERSHEY_SIMPLEX
@@ -105,6 +105,7 @@ def main():
         fgmask = fgbg.apply(frame)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
+        fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_CLOSE, kernel)  # Added close for better blob stability
 
         contours, _ = cv2.findContours(fgmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = sorted(contours, key=cv2.contourArea, reverse=True)
@@ -146,7 +147,9 @@ def main():
                 curr_centers = trace_points[-1]
                 matched_prev = set()
 
-                for c_curr in curr_centers:
+                alpha = 0.4  # increased smoothing factor for smoother lines
+
+                for i, c_curr in enumerate(curr_centers):
                     if line_count >= max_total_lines:
                         break
                     min_dist = float('inf')
@@ -159,7 +162,12 @@ def main():
                             min_dist = dist
                             best_j = j
                     if best_j is not None and min_dist >= MIN_TRACK_LINE_LENGTH:
-                        cv2.line(frame, prev_centers[best_j], c_curr, COLOR, LINE_THICKNESS)
+                        # Smooth the current point with previous one for less jitter
+                        smoothed_pt = (
+                            int(alpha * c_curr[0] + (1 - alpha) * prev_centers[best_j][0]),
+                            int(alpha * c_curr[1] + (1 - alpha) * prev_centers[best_j][1])
+                        )
+                        cv2.line(frame, prev_centers[best_j], smoothed_pt, COLOR, LINE_THICKNESS)
                         line_count += 1
                         matched_prev.add(best_j)
 
@@ -212,3 +220,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
