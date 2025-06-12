@@ -46,7 +46,7 @@ def main():
     show_coordinates = get_yes_no_input("Show coordinates on boxes?", 'y')
 
     # Pixelation options
-    use_pixelation = get_yes_no_input("Enable pixelation effect inside boxes?", 'n')
+    use_pixelation = get_yes_no_input("Enable pixelation effect inside boxes?", 'y')
     if use_pixelation:
         pixel_size = get_int_input("Pixelation block size (larger = more pixelated)", 10)
         if pixel_size < 1:
@@ -55,6 +55,18 @@ def main():
     else:
         pixel_size = None
         max_pixelate_box_size = 0
+
+    # Sensitivity setting
+    sensitivity_choice = input("Detection sensitivity? [low/medium/high, default: medium]: ").strip().lower() or "medium"
+    if sensitivity_choice == "high":
+        contour_area_threshold = 30
+        var_threshold = 5
+    elif sensitivity_choice == "low":
+        contour_area_threshold = 200
+        var_threshold = 25
+    else:  # medium
+        contour_area_threshold = 80
+        var_threshold = 10
 
     COLOR = (255, 255, 255)
     FONT = cv2.FONT_HERSHEY_SIMPLEX
@@ -73,7 +85,16 @@ def main():
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(temp_video, fourcc, fps, (width, height))
 
-    fgbg = cv2.createBackgroundSubtractorMOG2()
+    fgbg = cv2.createBackgroundSubtractorMOG2(varThreshold=var_threshold, detectShadows=False)
+
+    # Prime background subtractor to prevent delay
+    for _ in range(10):
+        ret, warm_frame = cap.read()
+        if not ret:
+            break
+        fgbg.apply(warm_frame)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # rewind video to frame 0
+
     trace_points = []
 
     while True:
@@ -92,25 +113,21 @@ def main():
         for cnt in contours:
             if len(centers) >= max_boxes:
                 break
-            if cv2.contourArea(cnt) > 500:
+            if cv2.contourArea(cnt) > contour_area_threshold:
                 x, y, w, h = cv2.boundingRect(cnt)
                 cx, cy = x + w // 2, y + h // 2
                 centers.append((cx, cy))
 
-                # Extract ROI inside the bounding box
                 roi = frame[y:y+h, x:x+w].copy()
 
-                # Apply pixelation if enabled and box is small enough
                 if use_pixelation:
                     if max_pixelate_box_size == 0 or (w <= max_pixelate_box_size and h <= max_pixelate_box_size):
                         small = cv2.resize(roi, (max(1, w // pixel_size), max(1, h // pixel_size)), interpolation=cv2.INTER_LINEAR)
                         pixelated = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
                         frame[y:y+h, x:x+w] = pixelated
 
-                # Draw rectangle around the box
                 cv2.rectangle(frame, (x, y), (x + w, y + h), COLOR, BOX_THICKNESS)
 
-                # Conditionally draw coordinates above box
                 if show_coordinates:
                     label = f"({cx}, {cy})"
                     text_size, _ = cv2.getTextSize(label, FONT, FONT_SCALE, FONT_THICKNESS)
