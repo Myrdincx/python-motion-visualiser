@@ -18,6 +18,15 @@ def get_float_input(prompt, default):
     except:
         return default
 
+def get_yes_no_input(prompt, default='y'):
+    val = input(f"{prompt} [y/n, default: {default}]: ").strip().lower()
+    if val in ['y', 'yes']:
+        return True
+    elif val in ['n', 'no']:
+        return False
+    else:
+        return default.lower() in ['y', 'yes']
+
 def main():
     input_video = input("Enter input video filename [default: input.mp4]: ").strip() or "input.mp4"
     output_video = input("Enter output video filename [default: output.mp4]: ").strip() or "output.mp4"
@@ -33,6 +42,8 @@ def main():
     LINE_THICKNESS = get_int_input("Line thickness", 1)
     FONT_SCALE = get_float_input("Font scale", 0.5)
     FONT_THICKNESS = get_int_input("Font thickness", 1)
+
+    show_coordinates = get_yes_no_input("Show coordinates on boxes?", 'y')
 
     COLOR = (255, 255, 255)
     FONT = cv2.FONT_HERSHEY_SIMPLEX
@@ -78,12 +89,13 @@ def main():
                 # Draw rectangle
                 cv2.rectangle(frame, (x, y), (x + w, y + h), COLOR, BOX_THICKNESS)
 
-                # Draw coordinates above box
-                label = f"({cx}, {cy})"
-                text_size, _ = cv2.getTextSize(label, FONT, FONT_SCALE, FONT_THICKNESS)
-                text_x = x
-                text_y = y - 5 if y - 5 > text_size[1] else y + text_size[1] + 5
-                cv2.putText(frame, label, (text_x, text_y), FONT, FONT_SCALE, COLOR, FONT_THICKNESS)
+                # Conditionally draw coordinates above box
+                if show_coordinates:
+                    label = f"({cx}, {cy})"
+                    text_size, _ = cv2.getTextSize(label, FONT, FONT_SCALE, FONT_THICKNESS)
+                    text_x = x
+                    text_y = y - 5 if y - 5 > text_size[1] else y + text_size[1] + 5
+                    cv2.putText(frame, label, (text_x, text_y), FONT, FONT_SCALE, COLOR, FONT_THICKNESS)
 
         trace_points.append(centers)
         if len(trace_points) > max_trace_length + 1:
@@ -162,3 +174,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
