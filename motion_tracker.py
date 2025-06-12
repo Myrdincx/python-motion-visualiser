@@ -22,21 +22,23 @@ def main():
     input_video = input("Enter input video filename [default: input.mp4]: ").strip() or "input.mp4"
     output_video = input("Enter output video filename [default: output.mp4]: ").strip() or "output.mp4"
 
-    # Ask user to override defaults or keep them
+    # User-configurable parameters
     max_boxes = get_int_input("Max boxes per frame", 20)
     max_trace_length = get_int_input("Max trace length (number of frames to track)", 30)
-    max_total_lines = get_int_input("Max total connection lines per frame (0 to disable lines)", 5)  # 0 disables lines
+    max_total_lines = get_int_input("Max total connection lines per frame (0 to disable lines)", 5)
     max_jump_distance = get_float_input("Max pixel jump distance for tracking lines", 20)
 
+    # Drawing parameters
     COLOR = (255, 255, 255)
     BOX_THICKNESS = 1
     LINE_THICKNESS = 1
     FONT_SCALE = 0.5
     FONT_THICKNESS = 1
+    FONT = cv2.FONT_HERSHEY_SIMPLEX
     MIN_TRACK_LINE_LENGTH = 10
     MIN_WEB_LINE_LENGTH = 20
 
-    temp_video = "temp_video.mp4"
+    temp_video = "temp_video_no_audio.mp4"
 
     cap = cv2.VideoCapture(input_video)
     if not cap.isOpened():
@@ -72,21 +74,29 @@ def main():
                 x, y, w, h = cv2.boundingRect(cnt)
                 cx, cy = x + w // 2, y + h // 2
                 centers.append((cx, cy))
+
+                # Draw rectangle
                 cv2.rectangle(frame, (x, y), (x + w, y + h), COLOR, BOX_THICKNESS)
+
+                # Display coordinates above the box
+                label = f"({cx}, {cy})"
+                text_size, _ = cv2.getTextSize(label, FONT, FONT_SCALE, FONT_THICKNESS)
+                text_x = x
+                text_y = y - 5 if y - 5 > text_size[1] else y + text_size[1] + 5
+                cv2.putText(frame, label, (text_x, text_y), FONT, FONT_SCALE, COLOR, FONT_THICKNESS)
 
         trace_points.append(centers)
         if len(trace_points) > max_trace_length + 1:
             trace_points.pop(0)
 
         if max_total_lines > 0:
-            # Draw tracking lines
             line_count = 0
             if len(trace_points) > 1:
                 prev_centers = trace_points[-2]
                 curr_centers = trace_points[-1]
                 matched_prev = set()
 
-                for i, c_curr in enumerate(curr_centers):
+                for c_curr in curr_centers:
                     if line_count >= max_total_lines:
                         break
                     min_dist = float('inf')
@@ -103,10 +113,9 @@ def main():
                         line_count += 1
                         matched_prev.add(best_j)
 
-            # Draw web-like random lines between current boxes (limit to remaining line budget)
             remaining_lines = max_total_lines - line_count
             if remaining_lines > 0 and len(centers) > 1:
-                all_pairs = [(i, j) for i in range(len(centers)) for j in range(i+1, len(centers))]
+                all_pairs = [(i, j) for i in range(len(centers)) for j in range(i + 1, len(centers))]
                 random.shuffle(all_pairs)
                 lines_drawn = 0
                 for i, j in all_pairs:
@@ -153,4 +162,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
