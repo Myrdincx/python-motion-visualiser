@@ -45,6 +45,17 @@ def main():
 
     show_coordinates = get_yes_no_input("Show coordinates on boxes?", 'y')
 
+    # Pixelation options
+    use_pixelation = get_yes_no_input("Enable pixelation effect inside boxes?", 'n')
+    if use_pixelation:
+        pixel_size = get_int_input("Pixelation block size (larger = more pixelated)", 10)
+        if pixel_size < 1:
+            pixel_size = 10
+        max_pixelate_box_size = get_int_input("Max box width/height for pixelation (0 to disable size limit)", 100)
+    else:
+        pixel_size = None
+        max_pixelate_box_size = 0
+
     COLOR = (255, 255, 255)
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     MIN_TRACK_LINE_LENGTH = 10
@@ -86,7 +97,17 @@ def main():
                 cx, cy = x + w // 2, y + h // 2
                 centers.append((cx, cy))
 
-                # Draw rectangle
+                # Extract ROI inside the bounding box
+                roi = frame[y:y+h, x:x+w].copy()
+
+                # Apply pixelation if enabled and box is small enough
+                if use_pixelation:
+                    if max_pixelate_box_size == 0 or (w <= max_pixelate_box_size and h <= max_pixelate_box_size):
+                        small = cv2.resize(roi, (max(1, w // pixel_size), max(1, h // pixel_size)), interpolation=cv2.INTER_LINEAR)
+                        pixelated = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
+                        frame[y:y+h, x:x+w] = pixelated
+
+                # Draw rectangle around the box
                 cv2.rectangle(frame, (x, y), (x + w, y + h), COLOR, BOX_THICKNESS)
 
                 # Conditionally draw coordinates above box
@@ -174,4 +195,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
