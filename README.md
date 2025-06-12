@@ -1,5 +1,6 @@
 # Blob Tracking with Python
-This Python script analyzes motion in a video, draws bounding boxes around moving objects, optionally connects them with lines, and exports a new video with the original audio.
+A Python tool that applies a popular **blob tracking effect** on videos using OpenCV.  
+It detects moving objects as blobs, draws bounding boxes around them, and connects these blobs with dynamic tracking lines — creating an engaging visual trace of movement over time.
 
 > [!WARNING]  
 > This script is far from perfect, results may vary. Feel free to contribute in order to make it better!
@@ -34,12 +35,20 @@ python3 motion_tracker.py
 ```
 
 You'll be prompted for the following (with defaults):
-- Input video filename (default: input.mp4)
-- Output video filename (default: output.mp4)
-- Max boxes per frame (default: 20)
-- Max trace length (how many frames to track past motion, default: 30)
-- Max total connection lines per frame (set to 0 to disable lines)
-- Max jump distance (controls how far objects can move and still be linked, default: 20 pixels)
+| Parameter                                 | Default      | Description                                     |
+| ----------------------------------------- | ------------ | ----------------------------------------------- |
+| Input video filename                      | `input.mp4`  | Video to process                                |
+| Output video filename                     | `output.mp4` | Result video filename                           |
+| Max boxes per frame                       | `20`         | Maximum detected blobs shown per frame          |
+| Max trace length (frames to track motion) | `30`         | Number of frames to remember for tracking lines |
+| Max total connection lines per frame      | `5`          | Set to `0` to disable lines                     |
+| Max jump distance (pixels)                | `20`         | Maximum distance to link blobs between frames   |
+| Box thickness                             | `1`          | Thickness of bounding boxes                     |
+| Line thickness                            | `1`          | Thickness of connecting lines                   |
+| Font scale                                | `0.5`        | Scale of coordinate text                        |
+| Font thickness                            | `1`          | Thickness of coordinate text                    |
+| Show coordinates on boxes?                | `Yes`        | Toggle coordinate display above bounding boxes  |
+
 
 ### Files
 - `motion_tracker.py`: Main script
